@@ -1,0 +1,3 @@
+build/
+tools/debug.keystore
+android/smali_check/
