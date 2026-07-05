@@ -8,10 +8,21 @@ html, body {
   touch-action: none;
 }
 
+/*
+ * Mobile browser chrome (address bar / nav buttons) shrinks the *visible*
+ * viewport without shrinking `100vh`, which is measured against the
+ * largest possible viewport -- so a fixed 100vh element routinely runs
+ * taller than what's on screen and its bottom edge (our touch controls)
+ * ends up hidden behind the browser's own UI. `--app-vh` is kept in sync
+ * with the real visible height by JS (see main.js) as a fallback for
+ * browsers that don't yet support the dvh unit below.
+ */
 #root {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: calc(var(--app-vh, 1vh) * 100);
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,8 +36,8 @@ canvas {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 

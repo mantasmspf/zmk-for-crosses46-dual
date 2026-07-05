@@ -1,4 +1,18 @@
 (function () {
+  // Keep --app-vh pinned to the *visible* viewport height as a fallback for
+  // browsers without `dvh` support -- mobile browser chrome (address bar,
+  // nav buttons) can show/hide without firing a layout-relevant resize of
+  // 100vh, which otherwise leaves the bottom of the screen (touch controls)
+  // hidden behind that browser UI.
+  function syncViewportHeight() {
+    const h = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+    document.documentElement.style.setProperty("--app-vh", `${h}px`);
+  }
+  syncViewportHeight();
+  window.addEventListener("resize", syncViewportHeight);
+  window.addEventListener("orientationchange", syncViewportHeight);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", syncViewportHeight);
+
   const VIEW_W = 480;
   const VIEW_H = 272;
 
