@@ -32,6 +32,10 @@ tools/
   gen_sprites.py         regenerates every sprite/background PNG
   gen_icon.py             regenerates the launcher icon
   build_apk.sh             builds android/build/neon-runner.apk end-to-end
+  bundle_html.py           bundles www/ into one self-contained playable
+                           HTML file (dist/neon-runner-standalone.html) with
+                           every sprite inlined as a data URI -- no server
+                           needed, just open it
 android/
   AndroidManifest.xml
   smali/                   MainActivity, hand-written in Smali (see below)

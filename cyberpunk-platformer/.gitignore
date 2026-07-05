@@ -1,3 +1,4 @@
 build/
+dist/
 tools/debug.keystore
 android/smali_check/
