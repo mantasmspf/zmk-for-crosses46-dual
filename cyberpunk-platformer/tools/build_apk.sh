@@ -7,7 +7,6 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ANDROID_DIR="$ROOT/android"
-WWW_DIR="$ROOT/www"
 BUILD_DIR="$ROOT/build"
 FRAMEWORK_RES="/usr/share/android-framework-res/framework-res.apk"
 
@@ -18,8 +17,17 @@ echo "==> Regenerating sprites"
 python3 "$ROOT/tools/gen_sprites.py"
 python3 "$ROOT/tools/gen_icon.py"
 
+echo "==> Bundling into a single self-contained HTML file"
+# Ship the same one-file bundle (CSS/JS/sprites all inlined, sprites as
+# base64 data URIs) that's tested standalone, rather than a multi-file
+# tree loaded via separate file:///android_asset/ relative paths. This
+# sidesteps WebView-specific quirks around loading images/scripts as
+# separate assets -- everything the page needs is already inline in the
+# one HTML file the WebView loads.
+python3 "$ROOT/tools/bundle_html.py"
+
 echo "==> Staging web assets"
-cp -r "$WWW_DIR"/* "$BUILD_DIR/assets/www/"
+cp "$ROOT/dist/neon-runner-standalone.html" "$BUILD_DIR/assets/www/index.html"
 
 echo "==> Assembling classes.dex from Smali"
 smali assemble -a 33 -o "$BUILD_DIR/classes.dex" "$ANDROID_DIR/smali/"

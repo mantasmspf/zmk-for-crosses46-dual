@@ -267,7 +267,15 @@
     ctx.globalAlpha = 1;
   }
 
+  // Guards every drawImage() call below -- a broken or not-yet-decoded
+  // image throws on draw in some WebViews, which would otherwise kill the
+  // rAF loop (and the whole game) on the very first bad frame.
+  function imgReady(img) {
+    return !!img && img.complete && img.naturalWidth > 0;
+  }
+
   function drawTiles() {
+    if (!imgReady(IMG.tiles)) return;
     const x0 = Math.floor(camX / TILE);
     const x1 = Math.ceil((camX + VIEW_W) / TILE);
     for (let ty = 0; ty < level.height; ty++) {
@@ -287,6 +295,7 @@
   }
 
   function drawShards() {
+    if (!imgReady(IMG.shard)) return;
     level.shards.forEach(([tx, ty], i) => {
       if (shardsCollected[i]) return;
       const frame = Math.floor(performance.now() / 260) % 2;
@@ -297,6 +306,7 @@
   }
 
   function drawEnemies() {
+    if (!imgReady(IMG.enemy_drone)) return;
     enemies.forEach((e) => {
       const dx = e.x - camX;
       const dy = e.y + e.bob;
@@ -331,6 +341,7 @@
 
   function drawPlayer() {
     const sheet = IMG["player_" + player.anim];
+    if (!imgReady(sheet)) return;
     const frames = player.anim === "run" ? 4 : player.anim === "idle" ? 2 : 1;
     const frame = player.animFrame % frames;
     const dx = player.x - camX;
@@ -353,20 +364,31 @@
     ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
     if (level) {
-      drawParallax(IMG.bg_far, 0.15, 0.8);
-      drawParallax(IMG.bg_mid, 0.35, 0.9);
-      drawTiles();
-      drawCheckpoints();
-      drawShards();
-      drawExit();
-      drawEnemies();
-      drawPlayer();
-      drawParallax(IMG.rain, 0.5, 0.35);
-      Lighting.render(ctx, VIEW_W, VIEW_H, camX, 0, level, player, 0.5);
+      try {
+        drawParallax(IMG.bg_far, 0.15, 0.8);
+        drawParallax(IMG.bg_mid, 0.35, 0.9);
+        drawTiles();
+        drawCheckpoints();
+        drawShards();
+        drawExit();
+        drawEnemies();
+        drawPlayer();
+        drawParallax(IMG.rain, 0.5, 0.35);
+        Lighting.render(ctx, VIEW_W, VIEW_H, camX, 0, level, player, 0.5);
+      } catch (e) {
+        // Never let a single bad frame kill the render loop for the rest
+        // of the session -- fall back to the flat background fill above
+        // and keep going; the next frame gets a fresh attempt.
+        console.error("render error:", e);
+      }
     }
 
     const time = (performance.now() - startTime) / 1000;
-    if (glOk) Shader.render(gameCanvas, VIEW_W, VIEW_H, time);
+    try {
+      if (glOk) Shader.render(gameCanvas, VIEW_W, VIEW_H, time);
+    } catch (e) {
+      console.error("shader render error:", e);
+    }
   }
 
   function loop() {
@@ -375,8 +397,12 @@
     lastTime = now;
     dt = Math.min(dt, 0.033);
 
-    if (state === STATE.PLAYING) updatePlaying(dt);
-    render();
+    try {
+      if (state === STATE.PLAYING) updatePlaying(dt);
+      render();
+    } catch (e) {
+      console.error("game loop error:", e);
+    }
     requestAnimationFrame(loop);
   }
 
