@@ -117,7 +117,8 @@ canvas {
   bottom: 18px; left: 0; right: 0;
   z-index: 6;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: center;
   padding: 0 20px;
   pointer-events: none;
 }
@@ -133,8 +134,10 @@ canvas {
   text-shadow: 0 0 6px #57fff0;
 }
 .touch-btn:active { background: rgba(87,255,240,0.3); }
-#touch-jump { margin-left: 14px; }
-#touch-left { margin-right: 8px; }
+/* left/right movement buttons sit side by side (reachable by one thumb);
+   jump is pinned to the opposite edge for the other thumb. */
+#touch-left { margin-right: 14px; }
+#touch-jump { margin-left: auto; }
 
 @media (min-aspect-ratio: 21/9) {
   canvas { height: 100vh; width: auto; }
