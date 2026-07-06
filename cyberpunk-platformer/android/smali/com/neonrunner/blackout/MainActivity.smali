@@ -29,6 +29,18 @@
 
     invoke-virtual {v0, v1}, Landroid/view/Window;->addFlags(I)V
 
+    # go edge-to-edge: hide the status bar and nav bar so the game gets
+    # the full screen (Theme.NoTitleBar.Fullscreen in the manifest already
+    # drops the action bar + status bar; this also hides the nav bar and
+    # keeps it hidden via the "immersive sticky" flag)
+    invoke-virtual {v0}, Landroid/view/Window;->getDecorView()Landroid/view/View;
+
+    move-result-object v1
+
+    const/16 v2, 0x1706
+
+    invoke-virtual {v1, v2}, Landroid/view/View;->setSystemUiVisibility(I)V
+
     # build a full-screen WebView hosting the bundled game
     new-instance v0, Landroid/webkit/WebView;
 

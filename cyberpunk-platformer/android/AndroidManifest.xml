@@ -10,7 +10,8 @@
         android:label="Neon Runner"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
-        android:hardwareAccelerated="true">
+        android:hardwareAccelerated="true"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity
             android:name="com.neonrunner.blackout.MainActivity"
             android:label="Neon Runner"
