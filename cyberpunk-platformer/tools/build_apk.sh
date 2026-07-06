@@ -22,7 +22,7 @@ echo "==> Staging web assets"
 cp -r "$WWW_DIR"/* "$BUILD_DIR/assets/www/"
 
 echo "==> Assembling classes.dex from Smali"
-smali assemble -a 24 -o "$BUILD_DIR/classes.dex" "$ANDROID_DIR/smali/"
+smali assemble -a 33 -o "$BUILD_DIR/classes.dex" "$ANDROID_DIR/smali/"
 
 echo "==> Packaging resources + manifest + assets with aapt"
 aapt package -f \
